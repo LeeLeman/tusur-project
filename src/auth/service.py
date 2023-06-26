@@ -14,7 +14,7 @@ class AuthService:
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,
-            is_active=True
+            is_active=True,
         )
         self.session.add(db_user)
         await self.session.commit()

@@ -6,12 +6,14 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from fastapi.testclient import TestClient
 
 from settings import settings
-from src import Base
+from src.models import Base
 from src.database import get_db
 from src.main import app
 
 
-engine_test = create_async_engine(settings.TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+engine_test = create_async_engine(
+    settings.TEST_DATABASE_URL, connect_args={"check_same_thread": False}
+)
 async_session_test = async_sessionmaker(engine_test)
 metadata = Base.metadata
 

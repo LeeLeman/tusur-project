@@ -2,7 +2,7 @@ import re
 from uuid import UUID
 
 from fastapi import HTTPException
-from pydantic import BaseModel, constr, EmailStr, validator
+from pydantic import BaseModel, EmailStr, validator
 
 LETTER_MATCH_PATTERN = re.compile(r"^[а-яА-Яa-zA-Z\-]+$")
 
@@ -13,13 +13,13 @@ class TunedModel(BaseModel):
 
 
 class UserCreate(TunedModel):
-    first_name: constr(min_length=1)
-    last_name: constr(min_length=1)
+    first_name: str
+    last_name: str
     email: EmailStr
 
     @validator("first_name")
     def validate_first_name(cls, value):
-        if not LETTER_MATCH_PATTERN.match(value):
+        if not LETTER_MATCH_PATTERN.match(value) or len(value) < 1:
             raise HTTPException(
                 status_code=422, detail="First name should contain only letters"
             )
@@ -27,7 +27,7 @@ class UserCreate(TunedModel):
 
     @validator("last_name")
     def validate_last_name(cls, value):
-        if not LETTER_MATCH_PATTERN.match(value):
+        if not LETTER_MATCH_PATTERN.match(value) or len(value) < 1:
             raise HTTPException(
                 status_code=422, detail="Last name should contain only letters"
             )

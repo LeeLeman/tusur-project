@@ -17,6 +17,7 @@ def get_user_from_database(get_session):
         )
         res = await get_session.execute(stmt)
         return res.scalar_one_or_none()
+
     return get_user_from_user_data
 
 
