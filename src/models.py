@@ -1,5 +1,6 @@
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm.attributes import set_attribute
 
 convention = {
     "ix": "ix_%(column_0_label)s",
@@ -13,6 +14,10 @@ convention = {
 class Base(DeclarativeBase):
     __abstract__ = True
     metadata = MetaData(naming_convention=convention)
+
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            set_attribute(self, key, value)
 
     def __repr__(self) -> str:
         columns = ", ".join(

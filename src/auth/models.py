@@ -12,4 +12,6 @@ class User(Base):
     last_name: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True)
     hashed_password: Mapped[str]
-    is_active: Mapped[bool] = mapped_column(default=True)
+    is_active: Mapped[bool] = mapped_column(default=True, server_default="true")
+    is_admin: Mapped[bool] = mapped_column(default=False, server_default="false")
+    is_superuser: Mapped[bool] = mapped_column(default=False, server_default="false")
