@@ -3,6 +3,7 @@ on: push
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: DEV
     steps:
       - name: Checkout Project
         uses: actions/checkout@v3

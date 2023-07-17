@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+python-dotenv = "1.0.0"
 fastapi = "0.98.0"
 uvicorn = {extras = ["standard"], version = "0.22.0"}
 sqlalchemy = "2.0.17"
