@@ -160,3 +160,4 @@ cython_debug/
 .idea/
 
 /db/database_test.db
+*.zip

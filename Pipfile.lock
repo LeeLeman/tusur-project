@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "683ff9bfa23af60976ec56d60b61f120b82546c291ac009c2d5a20cf771a7894"
+            "sha256": "9881684cc8a0aa445032c7d7fe09ffa7e092d50d4cb36bdf869c8b66895ce886"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -365,6 +365,14 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==1.2.4"
+        },
+        "mangum": {
+            "hashes": [
+                "sha256:5b4e26375e12eed051687670466d17968f8b74beecaca432edd4eb4127f78509",
+                "sha256:f00be705605bc4793958df62e4d249abf58d254c39d90bb410d069570206f4a2"
+            ],
+            "index": "pypi",
+            "version": "==0.17.0"
         },
         "markupsafe": {
             "hashes": [

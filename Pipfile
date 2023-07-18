@@ -16,6 +16,9 @@ python-multipart = "0.0.6"
 pydantic-settings = "2.0.1"
 python-jose = {extras = ["cryptography"], version = "3.3.0"}
 passlib = {extras = ["bcrypt"], version = "1.7.4"}
+mangum = "0.17.0"
+cryptography="3.4.8"
+bcrypt="3.2.2"
 
 [dev-packages]
 pytest = "7.4.0"
