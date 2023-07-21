@@ -21,6 +21,20 @@ def get_user_from_database(get_session):
 
 
 @pytest.fixture
+def make_user_inactive(get_session):
+    async def make_user_inactive_by_id(login_data: dict):
+        stmt = select(User).where(
+            User.email == login_data["username"],
+        )
+        res = await get_session.execute(stmt)
+        user = res.scalar_one_or_none()
+        user.is_active = False
+        await get_session.commit()
+
+    return make_user_inactive_by_id
+
+
+@pytest.fixture
 def create_user_data():
     return {
         "first_name": fake.first_name(),
@@ -44,7 +58,10 @@ def create_user(client) -> dict:
         "password": fake.password(),
     }
     client.post("/auth/register", json=create_user_data)
-    return create_user_data
+    return {
+        "username": create_user_data["email"],
+        "password": create_user_data["password"],
+    }
 
 
 @pytest.fixture(scope="module")
@@ -86,12 +103,40 @@ async def test_create_user(
     )
 
 
-async def test_login_user(async_client, create_user):
-    user_data: dict = create_user
-    login_data = {
-        "username": user_data["email"],
-        "password": user_data["password"],
+async def test_create_user_email_duplication_error(async_client, create_user_data):
+    await async_client.post("/auth/register", json=create_user_data)
+    same_email_user = {
+        "first_name": fake.first_name(),
+        "last_name": fake.last_name(),
+        "email": create_user_data["email"],
+        "password": fake.password(),
     }
+
+    result = await async_client.post("/auth/register", json=same_email_user)
+
+    data = result.json()
+    assert result.status_code == HTTPStatus.BAD_REQUEST
+    assert data["detail"] == "Database error: UNIQUE constraint failed: users.email"
+
+
+@pytest.mark.parametrize(
+    "user_data",
+    [
+        {},
+        {"first_name": 123, "last_name": 456, "email": "test@mail.com"},
+        {"first_name": "Test", "last_name": 123, "email": "test@mail.com"},
+        {"first_name": 123, "last_name": "Test", "email": "test@mail.com"},
+        {"first_name": "Testname", "last_name": "Testname", "email": "test"},
+    ],
+)
+async def test_create_user_validation_error(async_client, user_data):
+    result = await async_client.post("/auth/register", json=user_data)
+
+    assert result.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+async def test_login_active_user(async_client, create_user):
+    login_data = create_user
 
     result = await async_client.post(
         "/auth/token",
@@ -105,11 +150,16 @@ async def test_login_user(async_client, create_user):
     assert data["access_token"]
 
 
-async def test_read_users_me(async_client, create_user, get_headers):
-    result = await async_client.get("/auth/me", headers=get_headers)
+async def test_login_inactive_user(async_client, create_user, make_user_inactive):
+    login_data = create_user
+    await make_user_inactive(create_user)
+
+    result = await async_client.post(
+        "/auth/token",
+        data=login_data,
+        headers={"content-type": "application/x-www-form-urlencoded"},
+    )
 
     data = result.json()
-    assert result.status_code == HTTPStatus.OK
-    assert data["email"] == create_user["email"]
-    assert data["first_name"] == create_user["first_name"]
-    assert data["last_name"] == create_user["last_name"]
+    assert result.status_code == HTTPStatus.UNAUTHORIZED
+    assert data["detail"] == "User isn't active"
